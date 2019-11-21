@@ -1,0 +1,45 @@
+{
+  "name": "rql-to-mongo",
+  "version": "1.0.0",
+  "description": "Converts an RQL object to a mongo query object",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "ts-node src/index.ts",
+    "lint": "tslint \"./{src,tests}/**/*.ts\"",
+    "lint:fix": "npm run lint -- --fix",
+    "prettier": "prettier --write \"./{src,tests}/**/*.{js,ts,html,scss,css,md,json}\"",
+    "prettier:test": "prettier -c \"./{src,tests}/**/*.{js,ts,html,scss,css,md,json}\"",
+    "test:unit": "mocha --recursive --require ts-node/register 'src/**/*.spec.ts' --reporter mocha-multi-reporters --reporter-options configFile=mmr.config.json",
+    "test": "npm run test:ts && npm run test:unit",
+    "test:ts": "tsc --noemit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/swimlane/rql-to-mongo.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/swimlane/rql-to-mongo/issues"
+  },
+  "homepage": "https://github.com/swimlane/rql-to-mongo#readme",
+  "dependencies": {
+    "rql": "^0.3.3"
+  },
+  "devDependencies": {
+    "@swimlane/prettier-config-swimlane": "^2.0.0",
+    "@types/chai": "^4.1.4",
+    "@types/mocha": "^5.2.5",
+    "@types/node": "^8.0.47",
+    "chai": "^4.1.2",
+    "mocha": "^5.2.0",
+    "mocha-junit-reporter": "^1.18.0",
+    "mocha-multi-reporters": "^1.1.7",
+    "prettier": "~1.16.4",
+    "ts-node": "^7.0.1",
+    "tslint": "^5.20.1",
+    "tslint-config-prettier": "^1.18.0",
+    "tslint-config-swimlane": "^3.0.4",
+    "typescript": "^3.2.2"
+  }
+}
