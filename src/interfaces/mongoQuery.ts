@@ -3,5 +3,5 @@ export class MongoQuery {
   skip: number = 0;
   limit: number = 0;
   criteria: any = {};
-  sort: any = {};
+  sort: object = {};
 }

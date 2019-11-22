@@ -68,3 +68,6 @@ dist/
 
 # tmp files
 tmp/
+
+# test results
+test-results.xml

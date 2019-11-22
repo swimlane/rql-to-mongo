@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Converts an RQL object to a mongo query object",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "start": "ts-node src/index.ts",
     "lint": "tslint \"./{src,tests}/**/*.ts\"",
@@ -11,7 +12,10 @@
     "prettier:test": "prettier -c \"./{src,tests}/**/*.{js,ts,html,scss,css,md,json}\"",
     "test:unit": "mocha --recursive --require ts-node/register 'src/**/*.spec.ts' --reporter mocha-multi-reporters --reporter-options configFile=mmr.config.json",
     "test": "npm run test:ts && npm run test:unit",
-    "test:ts": "tsc --noemit"
+    "test:ts": "tsc --noemit",
+    "build": "npm-run-all -s build:*",
+    "build:clean": "rimraf dist/*",
+    "build:ts": "tsc -p tsconfig.build.json"
   },
   "repository": {
     "type": "git",
@@ -40,6 +44,8 @@
     "tslint": "^5.20.1",
     "tslint-config-prettier": "^1.18.0",
     "tslint-config-swimlane": "^3.0.4",
-    "typescript": "^3.2.2"
+    "typescript": "^3.2.2",
+    "npm-run-all": "^4.1.3",
+    "rimraf": "^2.6.2"
   }
 }
