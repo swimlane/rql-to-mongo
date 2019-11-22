@@ -37,20 +37,16 @@ export function validateRQL(rql: unknown): ParsedRQL {
           return rql;
         }
       case 'limit':
-        if (rql.args.length > 0) {
-          if (typeof rql.args[0] !== 'number') {
-            throw new Error(`RQL Operator ${rql.name} requires a number as the first argument`);
-          }
+        if (rql.args.length === 0 || typeof rql.args[0] !== 'number') {
+          throw new Error(`RQL Operator ${rql.name} requires a number as the first argument`);
         }
         if (rql.args.length > 1 && typeof rql.args[1] !== 'number') {
           throw new Error(`RQL Operator ${rql.name} requires a number as the second argument`);
         }
         return rql;
       case 'after':
-        if (rql.args.length > 0) {
-          if (typeof rql.args[0] !== 'string') {
-            throw new Error(`RQL Operator ${rql.name} requires a string as the first argument`);
-          }
+        if (rql.args.length === 0 || typeof rql.args[0] !== 'string') {
+          throw new Error(`RQL Operator ${rql.name} requires a string as the first argument`);
         }
         return rql;
       default:

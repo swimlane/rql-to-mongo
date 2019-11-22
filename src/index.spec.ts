@@ -2,12 +2,9 @@ import { expect } from 'chai';
 import { parseQuery } from 'rql/parser';
 
 import { RQLToMongo } from './index';
+import { MongoQuery } from './interfaces/mongoQuery';
 import { ParsedRQL } from './interfaces/parsedRQL';
 import { validateRQL } from './validator';
-
-describe('validateRQL', () => {
-  // TODO
-});
 
 describe('convertParsedRQL', () => {
   describe('when the input is null', () => {
@@ -48,6 +45,63 @@ describe('convertParsedRQL', () => {
       } finally {
         expect(e).to.not.be.null;
         if (e) expect(e.message).to.match(/RQL Operator is not allowed: select/);
+      }
+    });
+  });
+
+  describe('when incompatible criteria are passed with equals', () => {
+    let parsedRQL: ParsedRQL;
+    beforeEach(() => {
+      parsedRQL = validateRQL(parseQuery('eq(foo,1),ne(foo,2)'));
+    });
+
+    it('should throw an error', () => {
+      let e: Error | null = null;
+      try {
+        RQLToMongo.convertParsedRQL(parsedRQL);
+      } catch (err) {
+        e = err;
+      } finally {
+        expect(e).to.not.be.null;
+        if (e) expect(e.message).to.match(/conflicting operators: eq/);
+      }
+    });
+  });
+
+  describe('when incompatible criteria are passed with equals second', () => {
+    let parsedRQL: ParsedRQL;
+    beforeEach(() => {
+      parsedRQL = validateRQL(parseQuery('ne(foo,2),eq(foo,1)'));
+    });
+
+    it('should throw an error', () => {
+      let e: Error | null = null;
+      try {
+        RQLToMongo.convertParsedRQL(parsedRQL);
+      } catch (err) {
+        e = err;
+      } finally {
+        expect(e).to.not.be.null;
+        if (e) expect(e.message).to.match(/conflicting operators: eq/);
+      }
+    });
+  });
+
+  describe('when incompatible criteria are passed with equals and in/out', () => {
+    let parsedRQL: ParsedRQL;
+    beforeEach(() => {
+      parsedRQL = validateRQL(parseQuery('eq(foo,2),in(foo,1)'));
+    });
+
+    it('should throw an error', () => {
+      let e: Error | null = null;
+      try {
+        RQLToMongo.convertParsedRQL(parsedRQL);
+      } catch (err) {
+        e = err;
+      } finally {
+        expect(e).to.not.be.null;
+        if (e) expect(e.message).to.match(/conflicting operators: eq/);
       }
     });
   });
@@ -708,6 +762,107 @@ describe('operators', () => {
         skip: 0,
         sort: {}
       });
+    });
+  });
+});
+
+describe('parseRQLObj', () => {
+  describe('when an unknown operator is passed', () => {
+    let parsedRQL: ParsedRQL;
+    beforeEach(() => {
+      parsedRQL = validateRQL(parseQuery('eq(foo,2)'));
+      parsedRQL.args.push({
+        name: 'unknown',
+        args: ['foo']
+      });
+    });
+
+    it('should throw an error', () => {
+      let e: Error | null = null;
+      try {
+        const mongoQuery = new MongoQuery();
+        RQLToMongo.parseRQLObj(mongoQuery, mongoQuery.criteria, parsedRQL);
+      } catch (err) {
+        e = err;
+      } finally {
+        expect(e).to.not.be.null;
+        if (e) expect(e.message).to.match(/unknown operator/);
+      }
+    });
+  });
+});
+
+describe('handleSubCriteria', () => {
+  describe('when non-RQL is passed when RQL is required', () => {
+    let parsedRQL: ParsedRQL;
+    beforeEach(() => {
+      parsedRQL = validateRQL(parseQuery('eq(foo,2)'));
+      parsedRQL.args.push({
+        name: 'and',
+        args: ['foo']
+      });
+    });
+
+    it('should throw an error', () => {
+      let e: Error | null = null;
+      try {
+        const mongoQuery = new MongoQuery();
+        RQLToMongo.handleSubCriteria(mongoQuery, mongoQuery.criteria, parsedRQL);
+      } catch (err) {
+        e = err;
+      } finally {
+        expect(e).to.not.be.null;
+        if (e) expect(e.message).to.match(/expected RQL as the argument/);
+      }
+    });
+  });
+});
+
+describe('handleSort', () => {
+  describe('when non-string arg is passed', () => {
+    it('should throw an error', () => {
+      let e: Error | null = null;
+      try {
+        const mongoQuery = new MongoQuery();
+        RQLToMongo.handleSort(mongoQuery, [1]);
+      } catch (err) {
+        e = err;
+      } finally {
+        expect(e).to.not.be.null;
+        if (e) expect(e.message).to.match(/unexpected argument for sort operator: expected string/);
+      }
+    });
+  });
+});
+
+describe('handleLimit', () => {
+  describe('when non-number arg 1 is passed', () => {
+    it('should throw an error', () => {
+      let e: Error | null = null;
+      try {
+        const mongoQuery = new MongoQuery();
+        RQLToMongo.handleLimit(mongoQuery, ['a']);
+      } catch (err) {
+        e = err;
+      } finally {
+        expect(e).to.not.be.null;
+        if (e) expect(e.message).to.match(/unexpected argument 1 for limit operator: expected number/);
+      }
+    });
+  });
+
+  describe('when non-number arg 2 is passed', () => {
+    it('should throw an error', () => {
+      let e: Error | null = null;
+      try {
+        const mongoQuery = new MongoQuery();
+        RQLToMongo.handleLimit(mongoQuery, [1, 'b']);
+      } catch (err) {
+        e = err;
+      } finally {
+        expect(e).to.not.be.null;
+        if (e) expect(e.message).to.match(/unexpected argument 2 for limit operator: expected number/);
+      }
     });
   });
 });

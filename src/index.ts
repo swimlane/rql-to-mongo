@@ -92,9 +92,12 @@ export class RQLToMongo {
         break;
       case IN_OPERATOR:
       case OUT_OPERATOR:
-        if (!currentCriteria[fieldArg]) currentCriteria[fieldArg] = {};
-        else if (typeof currentCriteria[fieldArg] !== 'object')
+        if (!currentCriteria[fieldArg]) {
+          currentCriteria[fieldArg] = {};
+        }
+        if (typeof currentCriteria[fieldArg] !== 'object') {
           throw new Error('conflicting operators: eq and ' + operator + ' for ' + fieldArg);
+        }
         let value: unknown = parsedRQL.args[1];
         if (!(value instanceof Array)) value = [value];
         currentCriteria[fieldArg] = Object.assign(currentCriteria[fieldArg], {
@@ -111,7 +114,7 @@ export class RQLToMongo {
         RQLToMongo.handleAfter(mongoQuery, parsedRQL.args);
         break;
       default:
-        throw new Error('unknown operator ' + parsedRQL.name);
+        throw new Error('unreachable. unknown operator ' + parsedRQL.name);
     }
   }
 
@@ -181,8 +184,9 @@ export class RQLToMongo {
    */
   static handleLimit(mongoQuery: MongoQuery, args: any[]): void {
     if (typeof args[0] !== 'number') throw new Error('unexpected argument 1 for limit operator: expected number');
-    if (args.length > 1 && typeof args[1] !== 'number')
+    if (args.length > 1 && typeof args[1] !== 'number') {
       throw new Error('unexpected argument 2 for limit operator: expected number');
+    }
     mongoQuery.limit = args[0];
     if (args.length > 1) mongoQuery.skip = args[1];
   }
