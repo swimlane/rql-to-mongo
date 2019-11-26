@@ -1,2 +1,9 @@
 tsconfig.json
 src
+coverage/*
+.nyc*
+prettier.config.js
+mmr.config.json
+tslint.json
+test-results.xml
+tsconfig.build.json

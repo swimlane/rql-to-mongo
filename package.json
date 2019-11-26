@@ -2,6 +2,7 @@
   "name": "rql-to-mongo",
   "version": "1.0.0",
   "description": "Converts an RQL object to a mongo query object",
+  "private": true,
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
