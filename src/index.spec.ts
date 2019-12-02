@@ -131,6 +131,26 @@ describe('convertParsedRQL', () => {
     });
   });
 
+  describe('when a parent field and a sub-field both have settings', () => {
+    let parsedRQL: ParsedRQL;
+    beforeEach(() => {
+      parsedRQL = validateRQL(parseQuery('eq(foo,2),eq(foo.bar,1)'));
+    });
+
+    it('should build both criteria', () => {
+      expect(RQLToMongo.convertParsedRQL(parsedRQL)).to.deep.eq({
+        after: '',
+        criteria: {
+          foo: 2,
+          'foo.bar': 1
+        },
+        limit: 0,
+        skip: 0,
+        sort: {}
+      });
+    });
+  });
+
   describe('when valid RQL with nested and/or is passed', () => {
     let parsedRQL: ParsedRQL;
     beforeEach(() => {
@@ -863,6 +883,23 @@ describe('handleLimit', () => {
         expect(e).to.not.be.null;
         if (e) expect(e.message).to.match(/unexpected argument 2 for limit operator: expected number/);
       }
+    });
+  });
+
+  describe('handleAfter', () => {
+    describe('when non-string arg is passed', () => {
+      it('should throw an error', () => {
+        let e: Error | null = null;
+        try {
+          const mongoQuery = new MongoQuery();
+          RQLToMongo.handleAfter(mongoQuery, [1]);
+        } catch (err) {
+          e = err;
+        } finally {
+          expect(e).to.not.be.null;
+          if (e) expect(e.message).to.match(/unexpected argument 1 for after operator: expected string/);
+        }
+      });
     });
   });
 });

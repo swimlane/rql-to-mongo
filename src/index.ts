@@ -199,7 +199,7 @@ export class RQLToMongo {
    * @returns {void}
    */
   static handleAfter(mongoQuery: MongoQuery, args: any[]): void {
-    // this is perhaps a purely numeric hex string. just make it a string.
-    mongoQuery.after = args[0].toString();
+    if (typeof args[0] !== 'string') throw new Error('unexpected argument 1 for after operator: expected string');
+    mongoQuery.after = args[0];
   }
 }
