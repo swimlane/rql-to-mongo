@@ -1,45 +1,16 @@
 import { expect } from 'chai';
-import { parseQuery } from 'rql/parser';
 
 import { RQLToMongo } from './index';
 import { MongoQuery } from './interfaces/mongoQuery';
-import { ParsedRQL } from './interfaces/parsedRQL';
+import { RQLQuery } from './rql/query';
 import { validateRQL } from './validator';
 
-describe('convertParsedRQL', () => {
-  describe('when the input is null', () => {
-    it('should throw an error', () => {
-      let e: Error | null = null;
-      try {
-        RQLToMongo.convertParsedRQL(null);
-      } catch (err) {
-        e = err;
-      } finally {
-        expect(e).to.not.be.null;
-        if (e) expect(e.message).to.match(/Argument is not valid RQL object/);
-      }
-    });
-  });
-
-  describe('when the input is not valid RQL', () => {
-    it('should throw an error', () => {
-      let e: Error | null = null;
-      try {
-        RQLToMongo.convertParsedRQL({ some: 'thing' });
-      } catch (err) {
-        e = err;
-      } finally {
-        expect(e).to.not.be.null;
-        if (e) expect(e.message).to.match(/Argument is not valid RQL object/);
-      }
-    });
-  });
-
+describe('convertRQLQuery', () => {
   describe('when the input has an invalid RQL operator', () => {
     it('should throw an error', () => {
       let e: Error | null = null;
       try {
-        RQLToMongo.convertParsedRQL({ name: 'select', args: [] });
+        RQLToMongo.convertRQLQuery(new RQLQuery('select', []));
       } catch (err) {
         e = err;
       } finally {
@@ -50,15 +21,15 @@ describe('convertParsedRQL', () => {
   });
 
   describe('when incompatible criteria are passed with equals', () => {
-    let parsedRQL: ParsedRQL;
+    let rqlQuery: RQLQuery;
     beforeEach(() => {
-      parsedRQL = validateRQL(parseQuery('eq(foo,1),ne(foo,2)'));
+      rqlQuery = validateRQL(RQLQuery.parse('eq(foo,1),ne(foo,2)'));
     });
 
     it('should throw an error', () => {
       let e: Error | null = null;
       try {
-        RQLToMongo.convertParsedRQL(parsedRQL);
+        RQLToMongo.convertRQLQuery(rqlQuery);
       } catch (err) {
         e = err;
       } finally {
@@ -69,15 +40,15 @@ describe('convertParsedRQL', () => {
   });
 
   describe('when incompatible criteria are passed with equals second', () => {
-    let parsedRQL: ParsedRQL;
+    let rqlQuery: RQLQuery;
     beforeEach(() => {
-      parsedRQL = validateRQL(parseQuery('ne(foo,2),eq(foo,1)'));
+      rqlQuery = validateRQL(RQLQuery.parse('ne(foo,2),eq(foo,1)'));
     });
 
     it('should throw an error', () => {
       let e: Error | null = null;
       try {
-        RQLToMongo.convertParsedRQL(parsedRQL);
+        RQLToMongo.convertRQLQuery(rqlQuery);
       } catch (err) {
         e = err;
       } finally {
@@ -88,15 +59,15 @@ describe('convertParsedRQL', () => {
   });
 
   describe('when incompatible criteria are passed with equals and in/out', () => {
-    let parsedRQL: ParsedRQL;
+    let rqlQuery: RQLQuery;
     beforeEach(() => {
-      parsedRQL = validateRQL(parseQuery('eq(foo,2),in(foo,1)'));
+      rqlQuery = validateRQL(RQLQuery.parse('eq(foo,2),in(foo,1)'));
     });
 
     it('should throw an error', () => {
       let e: Error | null = null;
       try {
-        RQLToMongo.convertParsedRQL(parsedRQL);
+        RQLToMongo.convertRQLQuery(rqlQuery);
       } catch (err) {
         e = err;
       } finally {
@@ -107,15 +78,15 @@ describe('convertParsedRQL', () => {
   });
 
   describe('when valid RQL is passed', () => {
-    let parsedRQL: ParsedRQL;
+    let rqlQuery: RQLQuery;
     beforeEach(() => {
-      parsedRQL = validateRQL(
-        parseQuery('and(and(gt(utc,1574349588000),eq(things.example_thing_name.value,688692340)),eq(some,thing))')
+      rqlQuery = validateRQL(
+        RQLQuery.parse('and(and(gt(utc,1574349588000),eq(things.example_thing_name.value,688692340)),eq(some,thing))')
       );
     });
 
     it('should return a valid mongo query object', () => {
-      expect(RQLToMongo.convertParsedRQL(parsedRQL)).to.deep.eq({
+      expect(RQLToMongo.convertRQLQuery(rqlQuery)).to.deep.eq({
         after: '',
         criteria: {
           some: 'thing',
@@ -132,13 +103,13 @@ describe('convertParsedRQL', () => {
   });
 
   describe('when a parent field and a sub-field both have settings', () => {
-    let parsedRQL: ParsedRQL;
+    let rqlQuery: RQLQuery;
     beforeEach(() => {
-      parsedRQL = validateRQL(parseQuery('eq(foo,2),eq(foo.bar,1)'));
+      rqlQuery = validateRQL(RQLQuery.parse('eq(foo,2),eq(foo.bar,1)'));
     });
 
     it('should build both criteria', () => {
-      expect(RQLToMongo.convertParsedRQL(parsedRQL)).to.deep.eq({
+      expect(RQLToMongo.convertRQLQuery(rqlQuery)).to.deep.eq({
         after: '',
         criteria: {
           foo: 2,
@@ -152,15 +123,17 @@ describe('convertParsedRQL', () => {
   });
 
   describe('when valid RQL with nested and/or is passed', () => {
-    let parsedRQL: ParsedRQL;
+    let rqlQuery: RQLQuery;
     beforeEach(() => {
-      parsedRQL = validateRQL(
-        parseQuery('or(and(gt(heartbeat,1574349588000),eq(things.example_thing_name.value,688692340)),eq(some,thing))')
+      rqlQuery = validateRQL(
+        RQLQuery.parse(
+          'or(and(gt(heartbeat,1574349588000),eq(things.example_thing_name.value,688692340)),eq(some,thing))'
+        )
       );
     });
 
     it('should return a valid mongo query object', () => {
-      expect(RQLToMongo.convertParsedRQL(parsedRQL)).to.deep.eq({
+      expect(RQLToMongo.convertRQLQuery(rqlQuery)).to.deep.eq({
         after: '',
         criteria: {
           $or: [
@@ -183,13 +156,13 @@ describe('convertParsedRQL', () => {
   });
 
   describe('when valid RQL sort() is passed', () => {
-    let parsedRQL: ParsedRQL;
+    let rqlQuery: RQLQuery;
     beforeEach(() => {
-      parsedRQL = validateRQL(parseQuery('ge(testInt,991063125)&sort(heartbeat,-things.example_thing_name.value)'));
+      rqlQuery = validateRQL(RQLQuery.parse('ge(testInt,991063125)&sort(heartbeat,-things.example_thing_name.value)'));
     });
 
     it('should return a valid mongo query object', () => {
-      expect(RQLToMongo.convertParsedRQL(parsedRQL)).to.deep.eq({
+      expect(RQLToMongo.convertRQLQuery(rqlQuery)).to.deep.eq({
         after: '',
         criteria: {
           testInt: {
@@ -207,17 +180,16 @@ describe('convertParsedRQL', () => {
   });
 
   describe('when valid RQL limit() and after() is passed', () => {
-    let parsedRQL: ParsedRQL;
+    let rqlQuery: RQLQuery;
     beforeEach(() => {
-      parsedRQL = validateRQL(
-        parseQuery(
-          'ge(testInt,991063125)&sort(heartbeat,-things.example_thing_name.value)&limit(10,2)&after(5dd6c6ccebd0d60f7a82cc0e)'
-        )
+      const parsedQuery: RQLQuery = RQLQuery.parse(
+        'ge(testInt,991063125)&sort(heartbeat,-things.example_thing_name.value)&limit(10,2)&after(5dd6c6ccebd0d60f7a82cc0e)'
       );
+      rqlQuery = validateRQL(parsedQuery);
     });
 
     it('should return a valid mongo query object', () => {
-      expect(RQLToMongo.convertParsedRQL(parsedRQL)).to.deep.eq({
+      expect(RQLToMongo.convertRQLQuery(rqlQuery)).to.deep.eq({
         after: '5dd6c6ccebd0d60f7a82cc0e',
         criteria: {
           testInt: {
@@ -517,9 +489,9 @@ describe('operators', () => {
     it('should return a mongo query object with many combined criteria', () => {
       const rqlString =
         'and(eq(testField1,111111),ne(testField2,222222),in(testFieldArr1,333333)),' +
-        'or(and(out(testFieldArr1,4444444),or(le(testField3,555555),out(testFieldArr1,555555))),lt(testField4,666666))' +
-        'and(gt(testField3,777777),ge(testField5,888888),or(lt(testField2,9999999),gt(testField2,888888)))' +
-        ',sort(testField2,-testField3),limit(500,5),after(01a0b9f08238fde)';
+        'or(and(out(testFieldArr1,4444444),or(le(testField3,555555),out(testFieldArr1,555555))),lt(testField4,666666)),' +
+        'and(gt(testField3,777777),ge(testField5,888888),or(lt(testField2,9999999),gt(testField2,888888))),' +
+        'sort(testField2,-testField3),limit(500,5),after(01a0b9f08238fde)';
       expect(RQLToMongo.convertRQLString(rqlString)).to.deep.eq({
         after: '01a0b9f08238fde',
         criteria: {
@@ -788,10 +760,10 @@ describe('operators', () => {
 
 describe('parseRQLObj', () => {
   describe('when an unknown operator is passed', () => {
-    let parsedRQL: ParsedRQL;
+    let rqlQuery: RQLQuery;
     beforeEach(() => {
-      parsedRQL = validateRQL(parseQuery('eq(foo,2)'));
-      parsedRQL.args.push({
+      rqlQuery = validateRQL(RQLQuery.parse('and(eq(foo,2))'));
+      rqlQuery.args.push({
         name: 'unknown',
         args: ['foo']
       });
@@ -801,7 +773,7 @@ describe('parseRQLObj', () => {
       let e: Error | null = null;
       try {
         const mongoQuery = new MongoQuery();
-        RQLToMongo.parseRQLObj(mongoQuery, mongoQuery.criteria, parsedRQL);
+        RQLToMongo.parseRQLObj(mongoQuery, mongoQuery.criteria, rqlQuery);
       } catch (err) {
         e = err;
       } finally {
@@ -814,10 +786,10 @@ describe('parseRQLObj', () => {
 
 describe('handleSubCriteria', () => {
   describe('when non-RQL is passed when RQL is required', () => {
-    let parsedRQL: ParsedRQL;
+    let rqlQuery: RQLQuery;
     beforeEach(() => {
-      parsedRQL = validateRQL(parseQuery('eq(foo,2)'));
-      parsedRQL.args.push({
+      rqlQuery = validateRQL(RQLQuery.parse('eq(foo,2)'));
+      rqlQuery.args.push({
         name: 'and',
         args: ['foo']
       });
@@ -827,7 +799,7 @@ describe('handleSubCriteria', () => {
       let e: Error | null = null;
       try {
         const mongoQuery = new MongoQuery();
-        RQLToMongo.handleSubCriteria(mongoQuery, mongoQuery.criteria, parsedRQL);
+        RQLToMongo.handleSubCriteria(mongoQuery, mongoQuery.criteria, rqlQuery);
       } catch (err) {
         e = err;
       } finally {
