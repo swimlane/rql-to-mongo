@@ -1,3 +1,4 @@
+import { RQLValidationError } from './interfaces/error';
 import { RQLQuery } from './rql/query';
 
 /**
@@ -17,38 +18,38 @@ export function validateRQL(rqlQuery: RQLQuery): RQLQuery {
     case 'gt':
     case 'ge':
       if (rqlArgs.length > 0) {
-        throw new Error(`RQL is not allowed in arguments for operator: ${rqlQuery.name}`);
+        throw new RQLValidationError(`RQL is not allowed in arguments for operator: ${rqlQuery.name}`);
       } else {
         return rqlQuery;
       }
     case 'and':
     case 'or':
       if (rqlArgs.length !== rqlQuery.args.length) {
-        throw new Error(`RQL is required in arguments for operator: ${rqlQuery.name}`);
+        throw new RQLValidationError(`RQL is required in arguments for operator: ${rqlQuery.name}`);
       } else {
         rqlQuery.args.forEach(validateRQL);
         return rqlQuery;
       }
     case 'sort':
       if (rqlQuery.args.filter(arg => typeof arg !== 'string').length > 0) {
-        throw new Error(`RQL Operator ${rqlQuery.name} requires string arguments`);
+        throw new RQLValidationError(`RQL Operator ${rqlQuery.name} requires string arguments`);
       } else {
         return rqlQuery;
       }
     case 'limit':
       if (rqlQuery.args.length === 0 || typeof rqlQuery.args[0] !== 'number') {
-        throw new Error(`RQL Operator ${rqlQuery.name} requires a number as the first argument`);
+        throw new RQLValidationError(`RQL Operator ${rqlQuery.name} requires a number as the first argument`);
       }
       if (rqlQuery.args.length > 1 && typeof rqlQuery.args[1] !== 'number') {
-        throw new Error(`RQL Operator ${rqlQuery.name} requires a number as the second argument`);
+        throw new RQLValidationError(`RQL Operator ${rqlQuery.name} requires a number as the second argument`);
       }
       return rqlQuery;
     case 'after':
       if (rqlQuery.args.length === 0 || typeof rqlQuery.args[0] !== 'string') {
-        throw new Error(`RQL Operator ${rqlQuery.name} requires a string as the first argument`);
+        throw new RQLValidationError(`RQL Operator ${rqlQuery.name} requires a string as the first argument`);
       }
       return rqlQuery;
     default:
-      throw new Error(`RQL Operator is not allowed: ${rqlQuery.name}`);
+      throw new RQLValidationError(`RQL Operator is not allowed: ${rqlQuery.name}`);
   }
 }

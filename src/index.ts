@@ -27,6 +27,12 @@ const OPERATOR_TO_CRITERIA = {
   [GE_OPERATOR]: '$gte'
 };
 
+/**
+ * Converts RQLQuery objects into a MongoQuery object for querying MongoDB
+ *
+ * @export
+ * @class RQLToMongo
+ */
 export class RQLToMongo {
   /**
    * Helper method to get a MongoQuery object directly from an RQL string.
