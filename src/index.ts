@@ -51,7 +51,7 @@ export class RQLToMongo {
    */
   static convertRQLQuery(rqlQuery: RQLQuery): MongoQuery {
     validateRQL(rqlQuery);
-    const mongoQuery = new MongoQuery();
+    const mongoQuery = RQLToMongo.getDefaultMongoQuery();
     RQLToMongo.parseRQLObj(mongoQuery, mongoQuery.criteria, rqlQuery);
     return mongoQuery;
   }
@@ -199,5 +199,20 @@ export class RQLToMongo {
   static handleAfter(mongoQuery: MongoQuery, args: any[]): void {
     if (typeof args[0] !== 'string') throw new Error('unexpected argument 1 for after operator: expected string');
     mongoQuery.after = args[0];
+  }
+
+  /**
+   * Factory for default MongoQuery
+   *
+   * @returns {MongoQuery}
+   */
+  static getDefaultMongoQuery(): MongoQuery {
+    return {
+      after: '',
+      skip: 0,
+      limit: 0,
+      criteria: {},
+      sort: {}
+    };
   }
 }

@@ -772,7 +772,7 @@ describe('parseRQLObj', () => {
     it('should throw an error', () => {
       let e: Error | null = null;
       try {
-        const mongoQuery = new MongoQuery();
+        const mongoQuery = RQLToMongo.getDefaultMongoQuery();
         RQLToMongo.parseRQLObj(mongoQuery, mongoQuery.criteria, rqlQuery);
       } catch (err) {
         e = err;
@@ -798,7 +798,7 @@ describe('handleSubCriteria', () => {
     it('should throw an error', () => {
       let e: Error | null = null;
       try {
-        const mongoQuery = new MongoQuery();
+        const mongoQuery = RQLToMongo.getDefaultMongoQuery();
         RQLToMongo.handleSubCriteria(mongoQuery, mongoQuery.criteria, rqlQuery);
       } catch (err) {
         e = err;
@@ -815,7 +815,7 @@ describe('handleSort', () => {
     it('should throw an error', () => {
       let e: Error | null = null;
       try {
-        const mongoQuery = new MongoQuery();
+        const mongoQuery = RQLToMongo.getDefaultMongoQuery();
         RQLToMongo.handleSort(mongoQuery, [1]);
       } catch (err) {
         e = err;
@@ -832,7 +832,7 @@ describe('handleLimit', () => {
     it('should throw an error', () => {
       let e: Error | null = null;
       try {
-        const mongoQuery = new MongoQuery();
+        const mongoQuery = RQLToMongo.getDefaultMongoQuery();
         RQLToMongo.handleLimit(mongoQuery, ['a']);
       } catch (err) {
         e = err;
@@ -847,7 +847,7 @@ describe('handleLimit', () => {
     it('should throw an error', () => {
       let e: Error | null = null;
       try {
-        const mongoQuery = new MongoQuery();
+        const mongoQuery = RQLToMongo.getDefaultMongoQuery();
         RQLToMongo.handleLimit(mongoQuery, [1, 'b']);
       } catch (err) {
         e = err;
@@ -863,7 +863,7 @@ describe('handleLimit', () => {
       it('should throw an error', () => {
         let e: Error | null = null;
         try {
-          const mongoQuery = new MongoQuery();
+          const mongoQuery = RQLToMongo.getDefaultMongoQuery();
           RQLToMongo.handleAfter(mongoQuery, [1]);
         } catch (err) {
           e = err;

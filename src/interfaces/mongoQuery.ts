@@ -1,7 +1,7 @@
-export class MongoQuery {
-  after: string = '';
-  skip: number = 0;
-  limit: number = 0;
-  criteria: any = {};
-  sort: object = {};
+export interface MongoQuery {
+  after: string;
+  skip: number;
+  limit: number;
+  criteria: any;
+  sort: object;
 }
