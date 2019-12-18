@@ -1,3 +1,4 @@
+import { RQLValidationError } from './interfaces/error';
 import { MongoQuery } from './interfaces/mongoQuery';
 import { RQLQuery } from './rql/query';
 import { validateRQL } from './validator';
@@ -40,7 +41,7 @@ export class RQLToMongo {
    *
    * @param rql the raw RQL string
    * @returns {MongoQuery}
-   * @throws {Error} if there are any validation errors in the provided RQL
+   * @throws {RQLValidationError} if there are any validation errors in the provided RQL
    */
   static convertRQLString(rql: string): MongoQuery {
     return RQLToMongo.convertRQLQuery(validateRQL(RQLQuery.parse(rql)));
@@ -53,7 +54,7 @@ export class RQLToMongo {
    *
    * @param {unknown} rql the RQL object output from the RQL parser library
    * @returns {MongoQuery}
-   * @throws {Error} if there are any validation errors in the provided RQL
+   * @throws {RQLValidationError} if there are any validation errors in the provided RQL
    */
   static convertRQLQuery(rqlQuery: RQLQuery): MongoQuery {
     validateRQL(rqlQuery);
@@ -69,6 +70,7 @@ export class RQLToMongo {
    * @param mongoQuery the result object we are passing around until it's ready
    * @param currentCriteria the criteria field of the MongoQuery object, or a sub-field thereof
    * @param {RQLQuery} rqlQuery the current RQLQuery object under processing
+   * @throws {RQLValidationError} if there are any validation errors in the provided RQL
    */
   static parseRQLObj(mongoQuery: MongoQuery, currentCriteria: object, rqlQuery: RQLQuery): void {
     const operator = rqlQuery.name;
@@ -79,7 +81,8 @@ export class RQLToMongo {
         RQLToMongo.handleSubCriteria(mongoQuery, currentCriteria, rqlQuery);
         break;
       case EQ_OPERATOR:
-        if (typeof currentCriteria[fieldArg] === 'object') throw new Error('conflicting operators: eq for ' + fieldArg);
+        if (typeof currentCriteria[fieldArg] === 'object')
+          throw new RQLValidationError('conflicting operators: eq for ' + fieldArg);
         currentCriteria[fieldArg] = rqlQuery.args[1];
         break;
       case NE_OPERATOR:
@@ -89,7 +92,7 @@ export class RQLToMongo {
       case GE_OPERATOR:
         if (!currentCriteria[fieldArg]) currentCriteria[fieldArg] = {};
         else if (typeof currentCriteria[fieldArg] !== 'object')
-          throw new Error('conflicting operators: eq and ' + operator + ' for ' + fieldArg);
+          throw new RQLValidationError('conflicting operators: eq and ' + operator + ' for ' + fieldArg);
         currentCriteria[fieldArg] = Object.assign(currentCriteria[fieldArg], {
           [OPERATOR_TO_CRITERIA[operator]]: rqlQuery.args[1]
         });
@@ -100,7 +103,7 @@ export class RQLToMongo {
           currentCriteria[fieldArg] = {};
         }
         if (typeof currentCriteria[fieldArg] !== 'object') {
-          throw new Error('conflicting operators: eq and ' + operator + ' for ' + fieldArg);
+          throw new RQLValidationError('conflicting operators: eq and ' + operator + ' for ' + fieldArg);
         }
         let value: unknown = rqlQuery.args[1];
         if (!(value instanceof Array)) value = [value];
@@ -118,7 +121,7 @@ export class RQLToMongo {
         RQLToMongo.handleAfter(mongoQuery, rqlQuery.args);
         break;
       default:
-        throw new Error('unreachable. unknown operator ' + rqlQuery.name);
+        throw new RQLValidationError('unreachable. unknown operator ' + rqlQuery.name);
     }
   }
 
@@ -134,6 +137,7 @@ export class RQLToMongo {
    * @param mongoQuery the result object we are passing around until it's ready
    * @param currentCriteria the criteria field of the MongoQuery object, or a sub-field thereof
    * @param {RQLQuery} rqlQuery the current RQLQuery object under processing
+   * @throws {RQLValidationError} if there are any validation errors in the provided RQL
    */
   static handleSubCriteria(mongoQuery: MongoQuery, currentCriteria: object, rqlQuery: RQLQuery) {
     let nextCriteria = currentCriteria;
@@ -150,7 +154,7 @@ export class RQLToMongo {
       if (arg.name && arg.args) {
         RQLToMongo.parseRQLObj(mongoQuery, nextCriteria, arg);
       } else {
-        throw new Error('expected RQL as the argument for "' + rqlQuery.name + '" operator');
+        throw new RQLValidationError('expected RQL as the argument for "' + rqlQuery.name + '" operator');
       }
     });
     if (rqlQuery.name === OR_OPERATOR) {
@@ -166,11 +170,12 @@ export class RQLToMongo {
    * @param {MongoQuery} mongoQuery the result object we are passing around
    * @param {any[]} args the arguments passed to sort(). these should be strings.
    * @returns {void}
+   * @throws {RQLValidationError} if there are any validation errors in the provided RQL
    */
   static handleSort(mongoQuery: MongoQuery, args: any[]): void {
     args.forEach((arg: any) => {
       if (!(typeof arg === 'string')) {
-        throw new Error('unexpected argument for sort operator: expected string');
+        throw new RQLValidationError('unexpected argument for sort operator: expected string');
       } else {
         const sortDirection = arg.startsWith('+') ? 1 : arg.startsWith('-') ? -1 : 1;
         const sortArg = arg.startsWith('+') || arg.startsWith('-') ? arg.substring(1) : arg;
@@ -185,11 +190,13 @@ export class RQLToMongo {
    * @param {MongoQuery} mongoQuery the result object we are passing around
    * @param {any[]} args the arguments passed to limit(). these should be integers.
    * @returns {void}
+   * @throws {RQLValidationError} if there are any validation errors in the provided RQL
    */
   static handleLimit(mongoQuery: MongoQuery, args: any[]): void {
-    if (typeof args[0] !== 'number') throw new Error('unexpected argument 1 for limit operator: expected number');
+    if (typeof args[0] !== 'number')
+      throw new RQLValidationError('unexpected argument 1 for limit operator: expected number');
     if (args.length > 1 && typeof args[1] !== 'number') {
-      throw new Error('unexpected argument 2 for limit operator: expected number');
+      throw new RQLValidationError('unexpected argument 2 for limit operator: expected number');
     }
     mongoQuery.limit = args[0];
     if (args.length > 1) mongoQuery.skip = args[1];
@@ -201,9 +208,11 @@ export class RQLToMongo {
    * @param {MongoQuery} mongoQuery the result object we are passing around
    * @param {any[]} args the arguments passed to after(). this should be a string.
    * @returns {void}
+   * @throws {RQLValidationError} if there are any validation errors in the provided RQL
    */
   static handleAfter(mongoQuery: MongoQuery, args: any[]): void {
-    if (typeof args[0] !== 'string') throw new Error('unexpected argument 1 for after operator: expected string');
+    if (typeof args[0] !== 'string')
+      throw new RQLValidationError('unexpected argument 1 for after operator: expected string');
     mongoQuery.after = args[0];
   }
 

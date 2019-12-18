@@ -5,7 +5,7 @@ import { RQLQuery } from './rql/query';
  * Validate the RQL object
  *
  * @param rql
- * @throws {RQLValidationError} if an unknown operator or invalid parameters are 
+ * @throws {RQLValidationError} if an unknown operator or invalid parameters are
  *  found
  */
 export function validateRQL(rqlQuery: RQLQuery): RQLQuery {
