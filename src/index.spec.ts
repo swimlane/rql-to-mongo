@@ -88,6 +88,7 @@ describe('convertRQLQuery', () => {
     it('should return a valid mongo query object', () => {
       expect(RQLToMongo.convertRQLQuery(rqlQuery)).to.deep.eq({
         after: '',
+        before: '',
         criteria: {
           some: 'thing',
           'things.example_thing_name.value': 688692340,
@@ -111,6 +112,7 @@ describe('convertRQLQuery', () => {
     it('should build both criteria', () => {
       expect(RQLToMongo.convertRQLQuery(rqlQuery)).to.deep.eq({
         after: '',
+        before: '',
         criteria: {
           foo: 2,
           'foo.bar': 1
@@ -135,6 +137,7 @@ describe('convertRQLQuery', () => {
     it('should return a valid mongo query object', () => {
       expect(RQLToMongo.convertRQLQuery(rqlQuery)).to.deep.eq({
         after: '',
+        before: '',
         criteria: {
           $or: [
             {
@@ -164,6 +167,7 @@ describe('convertRQLQuery', () => {
     it('should return a valid mongo query object', () => {
       expect(RQLToMongo.convertRQLQuery(rqlQuery)).to.deep.eq({
         after: '',
+        before: '',
         criteria: {
           testInt: {
             $gte: 991063125
@@ -191,6 +195,35 @@ describe('convertRQLQuery', () => {
     it('should return a valid mongo query object', () => {
       expect(RQLToMongo.convertRQLQuery(rqlQuery)).to.deep.eq({
         after: '5dd6c6ccebd0d60f7a82cc0e',
+        before: '',
+        criteria: {
+          testInt: {
+            $gte: 991063125
+          }
+        },
+        limit: 10,
+        skip: 2,
+        sort: {
+          heartbeat: 1,
+          'things.example_thing_name.value': -1
+        }
+      });
+    });
+  });
+
+  describe('when valid RQL limit() and before() is passed', () => {
+    let rqlQuery: RQLQuery;
+    beforeEach(() => {
+      const parsedQuery: RQLQuery = RQLQuery.parse(
+        'ge(testInt,991063125)&sort(heartbeat,-things.example_thing_name.value)&limit(10,2)&before(5dd6c6ccebd0d60f7a82cc0e)'
+      );
+      rqlQuery = validateRQL(parsedQuery);
+    });
+
+    it('should return a valid mongo query object', () => {
+      expect(RQLToMongo.convertRQLQuery(rqlQuery)).to.deep.eq({
+        after: '',
+        before: '5dd6c6ccebd0d60f7a82cc0e',
         criteria: {
           testInt: {
             $gte: 991063125
@@ -226,6 +259,7 @@ describe('operators', () => {
     it('should return a mongo query object with equals criteria', () => {
       expect(RQLToMongo.convertRQLString('eq(testInt,991063125)')).to.deep.eq({
         after: '',
+        before: '',
         criteria: {
           testInt: 991063125
         },
@@ -240,6 +274,7 @@ describe('operators', () => {
     it('should return a mongo query object with not equals criteria', () => {
       expect(RQLToMongo.convertRQLString('ne(testInt,991063125)')).to.deep.eq({
         after: '',
+        before: '',
         criteria: {
           testInt: {
             $ne: 991063125
@@ -256,6 +291,7 @@ describe('operators', () => {
     it('should return a mongo query object with in criteria', () => {
       expect(RQLToMongo.convertRQLString('in(testIntArr,991063125)')).to.deep.eq({
         after: '',
+        before: '',
         criteria: {
           testIntArr: {
             $in: [991063125]
@@ -272,6 +308,7 @@ describe('operators', () => {
     it('should return a mongo query object with out criteria', () => {
       expect(RQLToMongo.convertRQLString('out(testIntArr,991063125)')).to.deep.eq({
         after: '',
+        before: '',
         criteria: {
           testIntArr: {
             $nin: [991063125]
@@ -288,6 +325,7 @@ describe('operators', () => {
     it('should return a mongo query object with less than equal to criteria', () => {
       expect(RQLToMongo.convertRQLString('le(testInt,991063125)')).to.deep.eq({
         after: '',
+        before: '',
         criteria: {
           testInt: {
             $lte: 991063125
@@ -304,6 +342,7 @@ describe('operators', () => {
     it('should return a mongo query object with less than criteria', () => {
       expect(RQLToMongo.convertRQLString('lt(testInt,991063125)')).to.deep.eq({
         after: '',
+        before: '',
         criteria: {
           testInt: {
             $lt: 991063125
@@ -320,6 +359,7 @@ describe('operators', () => {
     it('should return a mongo query object with greater than criteria', () => {
       expect(RQLToMongo.convertRQLString('gt(testInt,991063125)')).to.deep.eq({
         after: '',
+        before: '',
         criteria: {
           testInt: {
             $gt: 991063125
@@ -336,6 +376,7 @@ describe('operators', () => {
     it('should return a mongo query object with greater than equal to criteria', () => {
       expect(RQLToMongo.convertRQLString('ge(testInt,991063125)')).to.deep.eq({
         after: '',
+        before: '',
         criteria: {
           testInt: {
             $gte: 991063125
@@ -352,6 +393,7 @@ describe('operators', () => {
     it('should return a mongo query object with and criteria', () => {
       expect(RQLToMongo.convertRQLString('and(gt(testInt,991063125),lt(testInt,999993125))')).to.deep.eq({
         after: '',
+        before: '',
         criteria: {
           testInt: {
             $gt: 991063125,
@@ -369,6 +411,7 @@ describe('operators', () => {
     it('should return a mongo query object with or criteria', () => {
       expect(RQLToMongo.convertRQLString('or(gt(testInt,991063125),lt(testInt,999993125))')).to.deep.eq({
         after: '',
+        before: '',
         criteria: {
           $or: [
             {
@@ -394,6 +437,7 @@ describe('operators', () => {
     it('should return a mongo query object with ascending sort criteria', () => {
       expect(RQLToMongo.convertRQLString('sort(+testInt)')).to.deep.eq({
         after: '',
+        before: '',
         criteria: {},
         limit: 0,
         skip: 0,
@@ -408,6 +452,7 @@ describe('operators', () => {
     it('should return a mongo query object with descending sort criteria', () => {
       expect(RQLToMongo.convertRQLString('sort(-testInt)')).to.deep.eq({
         after: '',
+        before: '',
         criteria: {},
         limit: 0,
         skip: 0,
@@ -422,6 +467,7 @@ describe('operators', () => {
     it('should return a mongo query object with default sort criteria', () => {
       expect(RQLToMongo.convertRQLString('sort(testInt)')).to.deep.eq({
         after: '',
+        before: '',
         criteria: {},
         limit: 0,
         skip: 0,
@@ -436,6 +482,7 @@ describe('operators', () => {
     it('should return a mongo query object with multiple sort criteria', () => {
       expect(RQLToMongo.convertRQLString('sort(testInt,-price,+name,-id)')).to.deep.eq({
         after: '',
+        before: '',
         criteria: {},
         limit: 0,
         skip: 0,
@@ -453,6 +500,7 @@ describe('operators', () => {
     it('should return a mongo query object with limit criteria', () => {
       expect(RQLToMongo.convertRQLString('limit(300)')).to.deep.eq({
         after: '',
+        before: '',
         criteria: {},
         limit: 300,
         skip: 0,
@@ -465,6 +513,7 @@ describe('operators', () => {
     it('should return a mongo query object with limit and skip criteria', () => {
       expect(RQLToMongo.convertRQLString('limit(300,12)')).to.deep.eq({
         after: '',
+        before: '',
         criteria: {},
         limit: 300,
         skip: 12,
@@ -477,6 +526,20 @@ describe('operators', () => {
     it('should return a mongo query object with after criteria', () => {
       expect(RQLToMongo.convertRQLString('after(01a0b9f08238fde)')).to.deep.eq({
         after: '01a0b9f08238fde',
+        before: '',
+        criteria: {},
+        limit: 0,
+        skip: 0,
+        sort: {}
+      });
+    });
+  });
+
+  describe('before', () => {
+    it('should return a mongo query object with before criteria', () => {
+      expect(RQLToMongo.convertRQLString('before(01a0b9f08238fde)')).to.deep.eq({
+        after: '',
+        before: '01a0b9f08238fde',
         criteria: {},
         limit: 0,
         skip: 0,
@@ -494,6 +557,7 @@ describe('operators', () => {
         'sort(testField2,-testField3),limit(500,5),after(01a0b9f08238fde)';
       expect(RQLToMongo.convertRQLString(rqlString)).to.deep.eq({
         after: '01a0b9f08238fde',
+        before: '',
         criteria: {
           $or: [
             {
@@ -557,6 +621,7 @@ describe('operators', () => {
     it('should return a mongo query object with criteria comparing field to constant', () => {
       expect(RQLToMongo.convertRQLString('eq(testInt1,9999999)')).to.deep.eq({
         after: '',
+        before: '',
         criteria: {
           testInt1: 9999999
         },
@@ -569,6 +634,7 @@ describe('operators', () => {
     it('should return a mongo query object with criteria comparing field to field', () => {
       expect(RQLToMongo.convertRQLString('eq(testInt1,testInt2)')).to.deep.eq({
         after: '',
+        before: '',
         criteria: {
           testInt1: 'testInt2'
         },
@@ -581,6 +647,7 @@ describe('operators', () => {
     it('should return a mongo query object with criteria comparing sub-field to constant', () => {
       expect(RQLToMongo.convertRQLString('eq(some.sub.field.testInt1,999999)')).to.deep.eq({
         after: '',
+        before: '',
         criteria: {
           'some.sub.field.testInt1': 999999
         },
@@ -593,6 +660,7 @@ describe('operators', () => {
     it('should return a mongo query object with criteria comparing sub-field to sub-field', () => {
       expect(RQLToMongo.convertRQLString('eq(some.sub.field.testInt1,some.sub.field.testInt2)')).to.deep.eq({
         after: '',
+        before: '',
         criteria: {
           'some.sub.field.testInt1': 'some.sub.field.testInt2'
         },
@@ -607,6 +675,7 @@ describe('operators', () => {
     it('should return a mongo query object with criteria having a number in number form', () => {
       expect(RQLToMongo.convertRQLString('eq(testInt1,9999999)')).to.deep.eq({
         after: '',
+        before: '',
         criteria: {
           testInt1: 9999999
         },
@@ -619,6 +688,7 @@ describe('operators', () => {
     it('should return a mongo query object with criteria having a number in string form', () => {
       expect(RQLToMongo.convertRQLString('eq(testInt1,string:9999999)')).to.deep.eq({
         after: '',
+        before: '',
         criteria: {
           testInt1: '9999999'
         },
@@ -631,6 +701,7 @@ describe('operators', () => {
     it('should return a mongo query object with criteria having a boolean in boolean form', () => {
       expect(RQLToMongo.convertRQLString('eq(testInt1,true)')).to.deep.eq({
         after: '',
+        before: '',
         criteria: {
           testInt1: true
         },
@@ -643,6 +714,7 @@ describe('operators', () => {
     it('should return a mongo query object with criteria having a boolean in string form', () => {
       expect(RQLToMongo.convertRQLString('eq(testInt1,string:true)')).to.deep.eq({
         after: '',
+        before: '',
         criteria: {
           testInt1: 'true'
         },
@@ -655,6 +727,7 @@ describe('operators', () => {
     it('should return a mongo query object with criteria having a double in double form', () => {
       expect(RQLToMongo.convertRQLString('eq(testInt1,5.921)')).to.deep.eq({
         after: '',
+        before: '',
         criteria: {
           testInt1: 5.921
         },
@@ -667,6 +740,7 @@ describe('operators', () => {
     it('should return a mongo query object with criteria having a double in string form', () => {
       expect(RQLToMongo.convertRQLString('eq(testInt1,string:5.921)')).to.deep.eq({
         after: '',
+        before: '',
         criteria: {
           testInt1: '5.921'
         },
@@ -679,6 +753,7 @@ describe('operators', () => {
     it('should return a mongo query object with in criteria having an array', () => {
       expect(RQLToMongo.convertRQLString('in(testInt1,(5,6,7,8))')).to.deep.eq({
         after: '',
+        before: '',
         criteria: {
           testInt1: {
             $in: [5, 6, 7, 8]
@@ -693,6 +768,7 @@ describe('operators', () => {
     it('should return a mongo query object with out criteria having an array', () => {
       expect(RQLToMongo.convertRQLString('out(testInt1,(5,6,7,8))')).to.deep.eq({
         after: '',
+        before: '',
         criteria: {
           testInt1: {
             $nin: [5, 6, 7, 8]
@@ -707,6 +783,7 @@ describe('operators', () => {
     it('should return a mongo query object with criteria having null', () => {
       expect(RQLToMongo.convertRQLString('eq(testInt1,null)')).to.deep.eq({
         after: '',
+        before: '',
         criteria: {
           testInt1: null
         },
@@ -719,6 +796,7 @@ describe('operators', () => {
     it('should return a mongo query object with criteria having null in string form', () => {
       expect(RQLToMongo.convertRQLString('eq(testInt1,string:null)')).to.deep.eq({
         after: '',
+        before: '',
         criteria: {
           testInt1: 'null'
         },
@@ -731,6 +809,7 @@ describe('operators', () => {
     it('should return a mongo query object with criteria having an isodate', () => {
       expect(RQLToMongo.convertRQLString('gt(foo,isodate:2001-01-01T00:00:00)')).to.deep.eq({
         after: '',
+        before: '',
         criteria: {
           foo: {
             $gt: new Date('2001-01-01T00:00:00.000Z')
@@ -745,6 +824,7 @@ describe('operators', () => {
     it('should return a mongo query object with criteria having an epoch date', () => {
       expect(RQLToMongo.convertRQLString('gt(foo,epoch:1574356414937)')).to.deep.eq({
         after: '',
+        before: '',
         criteria: {
           foo: {
             $gt: new Date('2019-11-21T17:13:34.937Z')
@@ -870,6 +950,23 @@ describe('handleLimit', () => {
         } finally {
           expect(e).to.not.be.null;
           if (e) expect(e.message).to.match(/unexpected argument 1 for after operator: expected string/);
+        }
+      });
+    });
+  });
+
+  describe('handleBefore', () => {
+    describe('when non-string arg is passed', () => {
+      it('should throw an error', () => {
+        let e: Error | null = null;
+        try {
+          const mongoQuery = RQLToMongo.getDefaultMongoQuery();
+          RQLToMongo.handleBefore(mongoQuery, [1]);
+        } catch (err) {
+          e = err;
+        } finally {
+          expect(e).to.not.be.null;
+          if (e) expect(e.message).to.match(/unexpected argument 1 for before operator: expected string/);
         }
       });
     });

@@ -50,12 +50,14 @@ Only a limited set of operators are currently supported:
 - sort(+field1,-field2): Sorts the results. + for ascending, - for descending.
 - limit(maximum,skip): Takes two args: maximum is a number which indicates the maximum number of results to return. Skip is a number which indicates how many items should be skipped before collecting the results
 - after(cursor): Takes a cursor identifying where to start the page of results
+- before(cursor): Takes a cursor identifying where to start a page of results going backwards in the list
 
 # MongoQuery
 
 The result object which is used for querying MongoDB:
 
 - `after: string;` The cursor identifying which item to skip to when collecting a result set
+- `before: string;` The cursor identifying the last item when collecting a result set going backwards
 - `skip: number;` The number of items to skip before collecting the results
 - `limit: number;` The maximum number of results to return
 - `criteria: any;` The MongoDB query criteria

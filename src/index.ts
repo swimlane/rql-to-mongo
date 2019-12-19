@@ -16,6 +16,7 @@ const GE_OPERATOR: string = 'ge';
 const SORT_OPERATOR: string = 'sort';
 const LIMIT_OPERATOR: string = 'limit';
 const AFTER_OPERATOR: string = 'after';
+const BEFORE_OPERATOR: string = 'before';
 
 const OPERATOR_TO_CRITERIA = {
   [OR_OPERATOR]: '$or',
@@ -120,6 +121,9 @@ export class RQLToMongo {
       case AFTER_OPERATOR:
         RQLToMongo.handleAfter(mongoQuery, rqlQuery.args);
         break;
+      case BEFORE_OPERATOR:
+        RQLToMongo.handleBefore(mongoQuery, rqlQuery.args);
+        break;
       default:
         throw new RQLValidationError('unreachable. unknown operator ' + rqlQuery.name);
     }
@@ -217,6 +221,20 @@ export class RQLToMongo {
   }
 
   /**
+   * Handle the before() operator
+   *
+   * @param {MongoQuery} mongoQuery the result object we are passing around
+   * @param {any[]} args the arguments passed to before(). this should be a string.
+   * @returns {void}
+   * @throws {RQLValidationError} if there are any validation errors in the provided RQL
+   */
+  static handleBefore(mongoQuery: MongoQuery, args: any[]): void {
+    if (typeof args[0] !== 'string')
+      throw new RQLValidationError('unexpected argument 1 for before operator: expected string');
+    mongoQuery.before = args[0];
+  }
+
+  /**
    * Factory for default MongoQuery
    *
    * @returns {MongoQuery}
@@ -224,6 +242,7 @@ export class RQLToMongo {
   static getDefaultMongoQuery(): MongoQuery {
     return {
       after: '',
+      before: '',
       skip: 0,
       limit: 0,
       criteria: {},

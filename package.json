@@ -54,7 +54,10 @@
     "extension": [
       ".ts"
     ],
-    "exclude": "**/*.spec.ts",
+    "exclude": [
+      "**/*.spec.ts",
+      "src/rql/*"
+    ],
     "reporter": [
       "lcov",
       "text-summary"

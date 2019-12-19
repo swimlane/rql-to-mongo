@@ -51,6 +51,11 @@ export function validateRQL(rqlQuery: RQLQuery): RQLQuery {
         throw new RQLValidationError(`RQL Operator ${rqlQuery.name} requires a string as the first argument`);
       }
       return rqlQuery;
+    case 'before':
+      if (rqlQuery.args.length === 0 || typeof rqlQuery.args[0] !== 'string') {
+        throw new RQLValidationError(`RQL Operator ${rqlQuery.name} requires a string as the first argument`);
+      }
+      return rqlQuery;
     default:
       throw new RQLValidationError(`RQL Operator is not allowed: ${rqlQuery.name}`);
   }

@@ -155,4 +155,42 @@ describe('validateRQL', () => {
       }
     });
   });
+
+  describe('when no args are passed to before()', () => {
+    const rqlString: string = 'before()';
+    let rqlQuery: RQLQuery;
+    beforeEach(() => {
+      rqlQuery = RQLQuery.parse(rqlString);
+    });
+    it('should throw an error', () => {
+      let e: Error | null = null;
+      try {
+        validateRQL(rqlQuery);
+      } catch (err) {
+        e = err;
+      } finally {
+        expect(e).to.not.be.null;
+        if (e) expect(e.message).to.match(/requires a string as the first argument/);
+      }
+    });
+  });
+
+  describe('when non-string first arg is passed to before()', () => {
+    const rqlString: string = 'before(1)';
+    let rqlQuery: RQLQuery;
+    beforeEach(() => {
+      rqlQuery = RQLQuery.parse(rqlString);
+    });
+    it('should throw an error', () => {
+      let e: Error | null = null;
+      try {
+        validateRQL(rqlQuery);
+      } catch (err) {
+        e = err;
+      } finally {
+        expect(e).to.not.be.null;
+        if (e) expect(e.message).to.match(/requires a string as the first argument/);
+      }
+    });
+  });
 });
