@@ -251,3 +251,6 @@ export class RQLToMongo {
     };
   }
 }
+
+export * from './interfaces/error';
+export * from './interfaces/mongoQuery';
