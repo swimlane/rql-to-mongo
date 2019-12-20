@@ -1,6 +1,7 @@
 {
   "name": "@swimlane/rql-to-mongo",
   "version": "1.0.0",
+  "author": "Swimlane <dev@swimlane.com>",
   "description": "Converts an RQL object to a mongo query object",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -21,8 +22,6 @@
     "type": "git",
     "url": "git+https://github.com/swimlane/rql-to-mongo.git"
   },
-  "author": "",
-  "license": "ISC",
   "bugs": {
     "url": "https://github.com/swimlane/rql-to-mongo/issues"
   },
