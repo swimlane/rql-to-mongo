@@ -1,8 +1,8 @@
+import { RQLQuery } from '@swimlane/rql';
 import { expect } from 'chai';
 
 import { RQLToMongo } from './index';
 import { MongoQuery } from './interfaces/mongoQuery';
-import { RQLQuery } from './rql/query';
 import { validateRQL } from './validator';
 
 describe('convertRQLQuery', () => {

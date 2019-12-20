@@ -1,6 +1,7 @@
+import { RQLQuery } from '@swimlane/rql';
+
 import { RQLValidationError } from './interfaces/error';
 import { MongoQuery } from './interfaces/mongoQuery';
-import { RQLQuery } from './rql/query';
 import { validateRQL } from './validator';
 
 const AND_OPERATOR: string = 'and';

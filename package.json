@@ -27,7 +27,9 @@
     "url": "https://github.com/swimlane/rql-to-mongo/issues"
   },
   "homepage": "https://github.com/swimlane/rql-to-mongo#readme",
-  "dependencies": {},
+  "dependencies": {
+    "@swimlane/rql": "^1.0.0"
+  },
   "devDependencies": {
     "@swimlane/prettier-config-swimlane": "^2.0.0",
     "@types/chai": "^4.1.4",

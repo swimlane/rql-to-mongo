@@ -1,6 +1,6 @@
+import { RQLQuery } from '@swimlane/rql';
 import { expect } from 'chai';
 
-import { RQLQuery } from './rql/query';
 import { validateRQL } from './validator';
 
 describe('validateRQL', () => {

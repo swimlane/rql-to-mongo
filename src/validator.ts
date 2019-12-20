@@ -1,5 +1,6 @@
+import { RQLQuery } from '@swimlane/rql';
+
 import { RQLValidationError } from './interfaces/error';
-import { RQLQuery } from './rql/query';
 
 /**
  * Validate the RQL object
