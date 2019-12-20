@@ -8,21 +8,21 @@ Status](https://travis-ci.org/swimlane/rql-to-mongo.svg?branch=master)](https://
 # Example
 
 ```ts
-    import { MongoQuery, RQLToMongo } from '@swimlane/rql-to-mongo';
-    import { RQLQuery } from '@swimlane/rql';
+import { MongoQuery, RQLToMongo } from '@swimlane/rql-to-mongo';
+import { RQLQuery } from '@swimlane/rql';
 
-	const rqlQuery: RQLQuery = RQLQuery.parse('eq(foo,3)&sort(-date)&limit(100,10)');
-    const mongoQuery = RQLToMongo.convertRQLQuery(rqlQuery);
-    
-	cursor = db.collection.find(mongoQuery.criteria, {
-		skip: mongoQuery.skip,
-		limit: mongoQuery.limit,
-		sort: mongoQuery.sort
-	});
+const rqlQuery: RQLQuery = RQLQuery.parse('eq(foo,3)&sort(-date)&limit(100,10)');
+const mongoQuery = RQLToMongo.convertRQLQuery(rqlQuery);
 
-	cursor.toArray(function (err, docs) {
-		// ...
-	});
+cursor = db.collection.find(mongoQuery.criteria, {
+	skip: mongoQuery.skip,
+	limit: mongoQuery.limit,
+	sort: mongoQuery.sort
+});
+
+cursor.toArray(function (err, docs) {
+	// ...
+});
 ```
 
 # Supported RQL operators
