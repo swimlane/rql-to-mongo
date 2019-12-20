@@ -52,6 +52,8 @@ Only a limited set of operators are currently supported:
 - after(cursor): Takes a cursor identifying where to start the page of results
 - before(cursor): Takes a cursor identifying where to start a page of results going backwards in the list
 
+Note: Cursor paginating using before() and after() is not directly supported by MongoDB. It requires some extra code or another library such as [mongo-cursor-pagination](https://github.com/mixmaxhq/mongo-cursor-pagination) to use these.
+
 # MongoQuery
 
 The result object which is used for querying MongoDB:
