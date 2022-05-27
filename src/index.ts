@@ -175,8 +175,10 @@ export class RQLToMongo {
   /**
    * Verify the projection nodes :: It can have exclusion with inclusion for _id field only
    * @param {MongoQuery} mongoQuery the result object we are passing around
+   * @returns {void}
+   * @throws {RQLValidationError} if there are any validation errors in the provided RQL
    */
-  static isProjectionAllowed(mongoQuery) {
+  static isProjectionAllowed(mongoQuery: MongoQuery): void {
     const existingNodes = Object.keys(mongoQuery.projection);
     const existingValues = [...new Set(Object.values(mongoQuery.projection))]; // can only have 0 and 1 value
     if (existingValues.length === 2 && !existingNodes.includes('_id')) {
@@ -197,7 +199,7 @@ export class RQLToMongo {
    * @returns {void}
    * @throws {RQLValidationError} if there are any validation errors in the provided RQL
    */
-  static handleProjection(mongoQuery, args) {
+  static handleProjection(mongoQuery: MongoQuery, args: any[]): void {
     args.forEach(arg => {
       if (!(typeof arg === 'string')) {
         throw new RQLValidationError('unexpected argument for select operator: expected string');
