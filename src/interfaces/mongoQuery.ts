@@ -11,4 +11,5 @@ export interface MongoQuery {
   limit: number;
   criteria: any;
   sort: object;
+  projection: object;
 }

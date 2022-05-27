@@ -10,12 +10,12 @@ describe('convertRQLQuery', () => {
     it('should throw an error', () => {
       let e: Error | null = null;
       try {
-        RQLToMongo.convertRQLQuery(new RQLQuery('select', []));
+        RQLToMongo.convertRQLQuery(new RQLQuery('search', []));
       } catch (err) {
         e = err;
       } finally {
         expect(e).to.not.be.null;
-        if (e) expect(e.message).to.match(/RQL Operator is not allowed: select/);
+        if (e) expect(e.message).to.match(/RQL Operator is not allowed: search/);
       }
     });
   });
@@ -98,7 +98,8 @@ describe('convertRQLQuery', () => {
         },
         limit: 0,
         skip: 0,
-        sort: {}
+        sort: {},
+        projection: {}
       });
     });
   });
@@ -119,7 +120,8 @@ describe('convertRQLQuery', () => {
         },
         limit: 0,
         skip: 0,
-        sort: {}
+        sort: {},
+        projection: {}
       });
     });
   });
@@ -153,7 +155,8 @@ describe('convertRQLQuery', () => {
         },
         limit: 0,
         skip: 0,
-        sort: {}
+        sort: {},
+        projection: {}
       });
     });
   });
@@ -178,7 +181,8 @@ describe('convertRQLQuery', () => {
         sort: {
           heartbeat: 1,
           'things.example_thing_name.value': -1
-        }
+        },
+        projection: {}
       });
     });
   });
@@ -206,7 +210,8 @@ describe('convertRQLQuery', () => {
         sort: {
           heartbeat: 1,
           'things.example_thing_name.value': -1
-        }
+        },
+        projection: {}
       });
     });
   });
@@ -234,7 +239,8 @@ describe('convertRQLQuery', () => {
         sort: {
           heartbeat: 1,
           'things.example_thing_name.value': -1
-        }
+        },
+        projection: {}
       });
     });
   });
@@ -265,7 +271,8 @@ describe('operators', () => {
         },
         limit: 0,
         skip: 0,
-        sort: {}
+        sort: {},
+        projection: {}
       });
     });
   });
@@ -282,7 +289,8 @@ describe('operators', () => {
         },
         limit: 0,
         skip: 0,
-        sort: {}
+        sort: {},
+        projection: {}
       });
     });
   });
@@ -299,7 +307,8 @@ describe('operators', () => {
         },
         limit: 0,
         skip: 0,
-        sort: {}
+        sort: {},
+        projection: {}
       });
     });
   });
@@ -316,7 +325,8 @@ describe('operators', () => {
         },
         limit: 0,
         skip: 0,
-        sort: {}
+        sort: {},
+        projection: {}
       });
     });
   });
@@ -333,7 +343,8 @@ describe('operators', () => {
         },
         limit: 0,
         skip: 0,
-        sort: {}
+        sort: {},
+        projection: {}
       });
     });
   });
@@ -350,7 +361,8 @@ describe('operators', () => {
         },
         limit: 0,
         skip: 0,
-        sort: {}
+        sort: {},
+        projection: {}
       });
     });
   });
@@ -367,7 +379,8 @@ describe('operators', () => {
         },
         limit: 0,
         skip: 0,
-        sort: {}
+        sort: {},
+        projection: {}
       });
     });
   });
@@ -384,7 +397,8 @@ describe('operators', () => {
         },
         limit: 0,
         skip: 0,
-        sort: {}
+        sort: {},
+        projection: {}
       });
     });
   });
@@ -402,7 +416,8 @@ describe('operators', () => {
         },
         limit: 0,
         skip: 0,
-        sort: {}
+        sort: {},
+        projection: {}
       });
     });
   });
@@ -428,7 +443,53 @@ describe('operators', () => {
         },
         limit: 0,
         skip: 0,
-        sort: {}
+        sort: {},
+        projection: {}
+      });
+    });
+  });
+
+  describe('select', () => {
+    it('should return a mongo query object with inlusive projection', () => {
+      expect(RQLToMongo.convertRQLString('select(+name,+type)')).to.deep.eq({
+        after: '',
+        before: '',
+        criteria: {},
+        limit: 0,
+        skip: 0,
+        sort: {},
+        projection: {
+          name: 1,
+          type: 1
+        }
+      });
+    });
+    it('should return a mongo query object with exclusive projection', () => {
+      expect(RQLToMongo.convertRQLString('select(-name,-type)')).to.deep.eq({
+        after: '',
+        before: '',
+        criteria: {},
+        limit: 0,
+        skip: 0,
+        sort: {},
+        projection: {
+          name: 0,
+          type: 0
+        }
+      });
+    });
+    it('should return a mongo query object with exclusive _id and inclusive projection', () => {
+      expect(RQLToMongo.convertRQLString('select(+name,-_id)')).to.deep.eq({
+        after: '',
+        before: '',
+        criteria: {},
+        limit: 0,
+        skip: 0,
+        sort: {},
+        projection: {
+          name: 1,
+          _id: 0
+        }
       });
     });
   });
@@ -443,7 +504,8 @@ describe('operators', () => {
         skip: 0,
         sort: {
           testInt: 1
-        }
+        },
+        projection: {}
       });
     });
   });
@@ -458,7 +520,8 @@ describe('operators', () => {
         skip: 0,
         sort: {
           testInt: -1
-        }
+        },
+        projection: {}
       });
     });
   });
@@ -473,7 +536,8 @@ describe('operators', () => {
         skip: 0,
         sort: {
           testInt: 1
-        }
+        },
+        projection: {}
       });
     });
   });
@@ -491,7 +555,8 @@ describe('operators', () => {
           price: -1,
           name: 1,
           id: -1
-        }
+        },
+        projection: {}
       });
     });
   });
@@ -504,7 +569,8 @@ describe('operators', () => {
         criteria: {},
         limit: 300,
         skip: 0,
-        sort: {}
+        sort: {},
+        projection: {}
       });
     });
   });
@@ -517,7 +583,8 @@ describe('operators', () => {
         criteria: {},
         limit: 300,
         skip: 12,
-        sort: {}
+        sort: {},
+        projection: {}
       });
     });
   });
@@ -530,7 +597,8 @@ describe('operators', () => {
         criteria: {},
         limit: 0,
         skip: 0,
-        sort: {}
+        sort: {},
+        projection: {}
       });
     });
   });
@@ -543,7 +611,8 @@ describe('operators', () => {
         criteria: {},
         limit: 0,
         skip: 0,
-        sort: {}
+        sort: {},
+        projection: {}
       });
     });
   });
@@ -612,7 +681,8 @@ describe('operators', () => {
         sort: {
           testField2: 1,
           testField3: -1
-        }
+        },
+        projection: {}
       });
     });
   });
@@ -627,7 +697,8 @@ describe('operators', () => {
         },
         limit: 0,
         skip: 0,
-        sort: {}
+        sort: {},
+        projection: {}
       });
     });
 
@@ -640,7 +711,8 @@ describe('operators', () => {
         },
         limit: 0,
         skip: 0,
-        sort: {}
+        sort: {},
+        projection: {}
       });
     });
 
@@ -653,7 +725,8 @@ describe('operators', () => {
         },
         limit: 0,
         skip: 0,
-        sort: {}
+        sort: {},
+        projection: {}
       });
     });
 
@@ -666,7 +739,8 @@ describe('operators', () => {
         },
         limit: 0,
         skip: 0,
-        sort: {}
+        sort: {},
+        projection: {}
       });
     });
   });
@@ -681,7 +755,8 @@ describe('operators', () => {
         },
         limit: 0,
         skip: 0,
-        sort: {}
+        sort: {},
+        projection: {}
       });
     });
 
@@ -694,7 +769,8 @@ describe('operators', () => {
         },
         limit: 0,
         skip: 0,
-        sort: {}
+        sort: {},
+        projection: {}
       });
     });
 
@@ -707,7 +783,8 @@ describe('operators', () => {
         },
         limit: 0,
         skip: 0,
-        sort: {}
+        sort: {},
+        projection: {}
       });
     });
 
@@ -720,7 +797,8 @@ describe('operators', () => {
         },
         limit: 0,
         skip: 0,
-        sort: {}
+        sort: {},
+        projection: {}
       });
     });
 
@@ -733,7 +811,8 @@ describe('operators', () => {
         },
         limit: 0,
         skip: 0,
-        sort: {}
+        sort: {},
+        projection: {}
       });
     });
 
@@ -746,7 +825,8 @@ describe('operators', () => {
         },
         limit: 0,
         skip: 0,
-        sort: {}
+        sort: {},
+        projection: {}
       });
     });
 
@@ -761,7 +841,8 @@ describe('operators', () => {
         },
         limit: 0,
         skip: 0,
-        sort: {}
+        sort: {},
+        projection: {}
       });
     });
 
@@ -776,7 +857,8 @@ describe('operators', () => {
         },
         limit: 0,
         skip: 0,
-        sort: {}
+        sort: {},
+        projection: {}
       });
     });
 
@@ -789,7 +871,8 @@ describe('operators', () => {
         },
         limit: 0,
         skip: 0,
-        sort: {}
+        sort: {},
+        projection: {}
       });
     });
 
@@ -802,7 +885,8 @@ describe('operators', () => {
         },
         limit: 0,
         skip: 0,
-        sort: {}
+        sort: {},
+        projection: {}
       });
     });
 
@@ -817,7 +901,8 @@ describe('operators', () => {
         },
         limit: 0,
         skip: 0,
-        sort: {}
+        sort: {},
+        projection: {}
       });
     });
 
@@ -832,7 +917,8 @@ describe('operators', () => {
         },
         limit: 0,
         skip: 0,
-        sort: {}
+        sort: {},
+        projection: {}
       });
     });
   });
@@ -902,6 +988,23 @@ describe('handleSort', () => {
       } finally {
         expect(e).to.not.be.null;
         if (e) expect(e.message).to.match(/unexpected argument for sort operator: expected string/);
+      }
+    });
+  });
+});
+
+describe('handleProjection', () => {
+  describe('when non-string arg is passed', () => {
+    it('should throw an error', () => {
+      let e: Error | null = null;
+      try {
+        const mongoQuery = RQLToMongo.getDefaultMongoQuery();
+        RQLToMongo.handleProjection(mongoQuery, [1]);
+      } catch (err) {
+        e = err;
+      } finally {
+        expect(e).to.not.be.null;
+        if (e) expect(e.message).to.match(/unexpected argument for select operator: expected string/);
       }
     });
   });

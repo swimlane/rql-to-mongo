@@ -18,6 +18,7 @@ const SORT_OPERATOR: string = 'sort';
 const LIMIT_OPERATOR: string = 'limit';
 const AFTER_OPERATOR: string = 'after';
 const BEFORE_OPERATOR: string = 'before';
+const SELECT_OPERATOR = 'select';
 
 const OPERATOR_TO_CRITERIA = {
   [OR_OPERATOR]: '$or',
@@ -113,6 +114,9 @@ export class RQLToMongo {
           [OPERATOR_TO_CRITERIA[operator]]: value
         });
         break;
+      case SELECT_OPERATOR:
+        RQLToMongo.handleProjection(mongoQuery, rqlQuery.args);
+        break;
       case SORT_OPERATOR:
         RQLToMongo.handleSort(mongoQuery, rqlQuery.args);
         break;
@@ -167,6 +171,43 @@ export class RQLToMongo {
         orCriteria
       );
     }
+  }
+  /**
+   * Verify the projection nodes :: It can have exclusion with inclusion for _id field only
+   * @param {MongoQuery} mongoQuery the result object we are passing around
+   */
+  static isProjectionAllowed(mongoQuery) {
+    const existingNodes = Object.keys(mongoQuery.projection);
+    const existingValues = [...new Set(Object.values(mongoQuery.projection))]; // can only have 0 and 1 value
+    if (existingValues.length === 2 && !existingNodes.includes('_id')) {
+      throw new RQLValidationError('can not send exclusion with inclusion except _id');
+    } else if (existingValues.length === 2) {
+      for (const key in mongoQuery.projection) {
+        if (key !== '_id' && mongoQuery.projection[key] === 0)
+          throw new RQLValidationError('can not send exclusion with inclusion except _id');
+      }
+    }
+  }
+
+  /**
+   * Handle the projection
+   *
+   * @param {MongoQuery} mongoQuery the result object we are passing around
+   * @param {any[]} args the arguments passed to select(). these should be strings.
+   * @returns {void}
+   * @throws {RQLValidationError} if there are any validation errors in the provided RQL
+   */
+  static handleProjection(mongoQuery, args) {
+    args.forEach(arg => {
+      if (!(typeof arg === 'string')) {
+        throw new RQLValidationError('unexpected argument for select operator: expected string');
+      } else {
+        const inclusion = arg.startsWith('+') ? 1 : arg.startsWith('-') ? 0 : 1;
+        const field = arg.startsWith('+') || arg.startsWith('-') ? arg.substring(1) : arg;
+        mongoQuery.projection[field] = inclusion;
+      }
+    });
+    RQLToMongo.isProjectionAllowed(mongoQuery);
   }
 
   /**
@@ -247,7 +288,8 @@ export class RQLToMongo {
       skip: 0,
       limit: 0,
       criteria: {},
-      sort: {}
+      sort: {},
+      projection: {}
     };
   }
 }

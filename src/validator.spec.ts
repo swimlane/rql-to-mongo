@@ -61,6 +61,25 @@ describe('validateRQL', () => {
     });
   });
 
+  describe('when non-string args are passed to select()', () => {
+    const rqlString: string = 'select(1,2)';
+    let rqlQuery: RQLQuery;
+    beforeEach(() => {
+      rqlQuery = RQLQuery.parse(rqlString);
+    });
+    it('should throw an error', () => {
+      let e: Error | null = null;
+      try {
+        validateRQL(rqlQuery);
+      } catch (err) {
+        e = err;
+      } finally {
+        expect(e).to.not.be.null;
+        if (e) expect(e.message).to.match(/requires string arguments/);
+      }
+    });
+  });
+
   describe('when no args are passed to limit()', () => {
     const rqlString: string = 'limit()';
     let rqlQuery: RQLQuery;

@@ -39,6 +39,12 @@ export function validateRQL(rqlQuery: RQLQuery): RQLQuery {
       } else {
         return rqlQuery;
       }
+    case 'select':
+      if (rqlQuery.args.filter(arg => typeof arg !== 'string').length > 0) {
+        throw new RQLValidationError(`RQL Operator ${rqlQuery.name} requires string arguments`);
+      } else {
+        return rqlQuery;
+      }
     case 'limit':
       if (rqlQuery.args.length === 0 || typeof rqlQuery.args[0] !== 'number') {
         throw new RQLValidationError(`RQL Operator ${rqlQuery.name} requires a number as the first argument`);
