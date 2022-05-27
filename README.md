@@ -54,6 +54,12 @@ Only a limited set of operators are currently supported:
 
 Note: Cursor paginating using before() and after() is not directly supported by MongoDB. It requires some extra code or another library such as [mongo-cursor-pagination](https://github.com/mixmaxhq/mongo-cursor-pagination) to use these.
 
+### Field limting operator
+
+- select(+field1,+field2,-field3): Select the fields with + sign and exclude with - sign
+
+Note: Combination of inclusion and exclusion is only allowed while retrieving the documents without _id i.e. (+field1,-_id)
+
 # MongoQuery
 
 The result object which is used for querying MongoDB:
@@ -64,6 +70,7 @@ The result object which is used for querying MongoDB:
 - `limit: number;` The maximum number of results to return
 - `criteria: any;` The MongoDB query criteria
 - `sort: object;` The MongoDB sorting criteria
+- `projection: object` The MongoDB projection criteria
 
 # Install
 
